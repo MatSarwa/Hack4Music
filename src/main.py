@@ -51,6 +51,7 @@ class MusicalGame:
         self.last_touch_time = 0
         self.touch_cooldown = 0.5  # 0.5 sekundy między dotknięciami
         self.control_mode = control_mode
+        self.game_mode = game_mode
         self.sequence_completed_time = 0
         self.waiting_for_next_level = False
         
@@ -217,9 +218,27 @@ class MusicalGame:
                 print("Gra rozpoczyna się od nowa...")
                 self.level = 1
                 self.generate_new_sequence()
+            elif choice == "menu":
+                print("Powrót do menu głównego...")
+                cv2.destroyAllWindows()
+                cap.release()
+                # restart aplikacji od wyboru
+                control_mode = choose_control_mode()
+                game_mode = choose_game_mode()
+                if game_mode == MODE_PLAYGROUND:
+                    run_playground(control_mode)
+                    exit()
+                elif game_mode == MODE_DOUBLE:
+                    print("Tryb dla dwóch graczy nie jest jeszcze zaimplementowany.")
+                    exit()
+                else:
+                    # nowa gra
+                    new_game = MusicalGame(control_mode)
+                    return new_game  # zwróć nową grę, żeby zastąpić starą
             else:
                 print("Gra zakończona.")
-                exit(0)  # albo break w pętli głównej
+                exit(0)
+
 
     
     def is_point_in_game_area(self, x, y, frame_width, frame_height):
@@ -262,14 +281,14 @@ def mouse_callback_game_mode(event, x, y, flags, param):
 game_over_choice = None  # globalna zmienna: "retry" albo "quit"
 
 def mouse_callback_game_over(event, x, y, flags, param):
-        global game_over_choice
-        if event == cv2.EVENT_LBUTTONDOWN:
-            # Graj ponownie
-            if 50 < x < 250 and 150 < y < 210:
-                game_over_choice = "retry"
-            # Zakończ
-            elif 50 < x < 250 and 250 < y < 310:
-                game_over_choice = "quit"
+    global game_over_choice
+    if event == cv2.EVENT_LBUTTONDOWN:
+        # Graj ponownie
+        if 50 < x < 250 and 150 < y < 210:
+            game_over_choice = "retry"
+        # Menu główne
+        elif 50 < x < 250 and 230 < y < 290:
+            game_over_choice = "menu"
 
 MODE_SINGLE = 1
 MODE_DOUBLE = 2
@@ -369,7 +388,7 @@ def show_game_over_screen():
     global game_over_choice
     game_over_choice = None
 
-    img = np.ones((400, 400, 3), dtype=np.uint8) * 255
+    img = np.ones((450, 400, 3), dtype=np.uint8) * 255
 
     # Nagłówek
     cv2.putText(img, "✗ Przegrales!", (60, 80),
@@ -380,9 +399,14 @@ def show_game_over_screen():
     cv2.putText(img, "Graj ponownie", (60, 190),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
 
+    # Przycisk Menu główne
+    cv2.rectangle(img, (50, 230), (250, 290), (200, 200, 200), -1)
+    cv2.putText(img, "Menu glowne", (60, 270),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
+
     # Przycisk Zakoncz
-    cv2.rectangle(img, (50, 250), (250, 310), (200, 200, 200), -1)
-    cv2.putText(img, "Zakoncz", (60, 290),
+    cv2.rectangle(img, (50, 310), (250, 370), (200, 200, 200), -1)
+    cv2.putText(img, "Zakoncz", (60, 350),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
 
     cv2.namedWindow("Koniec gry")
@@ -400,6 +424,7 @@ def show_game_over_screen():
 
     cv2.destroyWindow("Koniec gry")
     return game_over_choice
+
 
 # Wybór trybu sterowania
 control_mode = choose_control_mode()
@@ -478,6 +503,10 @@ while True:
     
     # Aktualizuj stan gry
     game.update()
+    if isinstance(game, MusicalGame) and hasattr(game, "new_game_pending"):
+        game = game.new_game_pending
+        del game.new_game_pending
+
     
     # Aktualizuj hover (dla trybu ręki) lub sprawdź kliknięcie (dla trybu myszy)
     if control_mode == CONTROL_HAND and cursor_x is not None and cursor_y is not None:
