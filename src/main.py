@@ -237,6 +237,7 @@ class MusicalGame:
                     return new_game  # zwróć nową grę, żeby zastąpić starą
             else:
                 print("Gra zakończona.")
+                cv2.destroyAllWindows()
                 exit(0)
 
 
@@ -404,11 +405,6 @@ def show_game_over_screen():
     cv2.putText(img, "Menu glowne", (60, 270),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
 
-    # Przycisk Zakoncz
-    cv2.rectangle(img, (50, 310), (250, 370), (200, 200, 200), -1)
-    cv2.putText(img, "Zakoncz", (60, 350),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
-
     cv2.namedWindow("Koniec gry")
     cv2.setMouseCallback("Koniec gry", mouse_callback_game_over)
 
@@ -419,6 +415,10 @@ def show_game_over_screen():
             break
 
         if cv2.waitKey(20) & 0xFF == 27:  # ESC
+            game_over_choice = "quit"
+            break
+
+        if cv2.getWindowProperty("Koniec gry", cv2.WND_PROP_VISIBLE) < 1:
             game_over_choice = "quit"
             break
 
