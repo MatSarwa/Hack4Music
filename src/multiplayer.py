@@ -5,7 +5,7 @@ import math
 import numpy as np
 import pygame
 
-# Definicja instrumentów z pozycjami (powtórzone z main.py dla niezależności)
+# Definicja instrumentow z pozycjami (powtorzone z main.py dla niezalezności)
 INSTRUMENTS = [
     {"name": "Pianino", "pos": (150, 100), "color": (255, 100, 100)},
     {"name": "Harmonijka", "pos": (400, 150), "color": (100, 255, 100)},
@@ -17,13 +17,13 @@ INSTRUMENTS = [
 
 pygame.mixer.init()
 
-# Załaduj dźwięki instrumentów
+# Zaladuj dzwieki instrumentow
 for instrument in INSTRUMENTS:
     instrument_name = instrument["name"].lower()
     try:
         instrument["sound"] = pygame.mixer.Sound(f"sound/{instrument_name}.mp3")
     except:
-        print(f"Nie można załadować dźwięku dla {instrument_name}")
+        print(f"Nie mozna zaladowac dzwieku dla {instrument_name}")
 
 INSTRUMENT_RADIUS = 40
 HIGHLIGHT_RADIUS = 60
@@ -47,11 +47,11 @@ class MultiplayerGame:
     def __init__(self, players, control_mode=CONTROL_HAND, starting_level=2):
         self.players = players  # Lista imion graczy
         self.scores = {player: 0 for player in players}  # Punkty graczy
-        self.current_creator_idx = 0  # Indeks gracza tworzącego sekwencję
+        self.current_creator_idx = 0  # Indeks gracza tworzacego sekwencje
         self.current_level = starting_level  # Poziom trudności
         self.created_sequence = []  # Sekwencja stworzona przez gracza
-        self.current_guesser_idx = 0  # Indeks gracza odgadującego
-        self.round_scores = {}  # Punkty za obecną rundę
+        self.current_guesser_idx = 0  # Indeks gracza odgadujacego
+        self.round_scores = {}  # Punkty za obecna runde
         self.control_mode = control_mode
         
         # Stany gry
@@ -65,23 +65,23 @@ class MultiplayerGame:
         self.last_touch_time = 0
         self.touch_cooldown = 0.5
         
-        # System hover dla trybu ręki
+        # System hover dla trybu reki
         self.hover_instrument = -1
         self.hover_start_time = 0
         self.hover_duration_needed = 1.0
         self.hover_progress = 0.0
         
         # Liczniki rund
-        self.completed_rounds_in_level = 0  # Ile graczy już stworzyło sekwencję na tym poziomie
-        self.total_rounds_per_level = len(players)  # Każdy gracz tworzy sekwencję raz na poziom
+        self.completed_rounds_in_level = 0  # Ile graczy juz stworzylo sekwencje na tym poziomie
+        self.total_rounds_per_level = len(players)  # Kazdy gracz tworzy sekwencje raz na poziom
         
-        self.show_message_until = 0  # Do wyświetlania komunikatów czasowych
+        self.show_message_until = 0  # Do wyświetlania komunikatow czasowych
         self.current_message = ""
         
-        print(f"🎵 Gra wieloosobowa rozpoczęta!")
+        print(f"🎵 Gra wieloosobowa rozpoczeta!")
         print(f"Gracze: {', '.join(self.players)}")
-        print(f"Poziom trudności: {self.current_level} instrumentów")
-        self.show_timed_message(f"Sekwencję wymyśla: {self.get_current_creator()}", 2.0)
+        print(f"Poziom trudności: {self.current_level} instrumentow")
+        self.show_timed_message(f"Sekwencje wymyśla: {self.get_current_creator()}", 2.0)
         
     def get_current_creator(self):
         return self.players[self.current_creator_idx]
@@ -98,16 +98,16 @@ class MultiplayerGame:
     def update(self):
         current_time = time.time()
         
-        # Ukryj wiadomość po czasie
+        # Ukryj wiadomośc po czasie
         if current_time > self.show_message_until:
             self.current_message = ""
         
         if self.game_state == GAME_STATE_WAITING_FOR_CREATOR:
-            # Czekamy aż twórca sekwencji utworzy melodię
+            # Czekamy az tworca sekwencji utworzy melodie
             pass
             
         elif self.game_state == GAME_STATE_SHOWING:
-            # Pokazywanie sekwencji graczom odgadującym
+            # Pokazywanie sekwencji graczom odgadujacym
             if self.sequence_display_index < len(self.sequence):
                 cycle_time = current_time - self.highlight_start_time
                 
@@ -126,7 +126,7 @@ class MultiplayerGame:
                     self.show_timed_message(f"Kolej {current_guesser}!", 1.5)
                     
         elif self.game_state == GAME_STATE_SUCCESS:
-            # Gracz odgadł sekwencję - przejdź do następnego gracza po krótkiej przerwie
+            # Gracz odgadl sekwencje - przejdz do nastepnego gracza po krotkiej przerwie
             if not hasattr(self, 'success_start_time'):
                 self.success_start_time = current_time
             elif current_time - self.success_start_time > 1.0:  # 1 sekunda przerwy
@@ -134,7 +134,7 @@ class MultiplayerGame:
                 self.next_guesser()
             
         elif self.game_state == GAME_STATE_GAME_OVER:
-            # Gracz się pomylił - przejdź do następnego gracza po krótkiej przerwie
+            # Gracz sie pomylil - przejdz do nastepnego gracza po krotkiej przerwie
             if not hasattr(self, 'game_over_start_time'):
                 self.game_over_start_time = current_time
             elif current_time - self.game_over_start_time > 1.5:  # 1.5 sekundy przerwy
@@ -142,10 +142,10 @@ class MultiplayerGame:
                 self.next_guesser()
             
         elif self.game_state == GAME_STATE_SHOWING_SCORES:
-            # Wyświetlanie wyników po rundzie
+            # Wyświetlanie wynikow po rundzie
             pass
         
-        # Aktualizuj hover dla trybu ręki
+        # Aktualizuj hover dla trybu reki
         if self.control_mode == CONTROL_HAND and self.game_state in [GAME_STATE_WAITING, GAME_STATE_WAITING_FOR_CREATOR]:
             if self.hover_instrument >= 0:
                 hover_elapsed = current_time - self.hover_start_time
@@ -205,90 +205,90 @@ class MultiplayerGame:
     def activate_instrument(self, instrument_index):
         current_time = time.time()
         
-        # Odtwórz dźwięk instrumentu
+        # Odtworz dzwiek instrumentu
         if "sound" in INSTRUMENTS[instrument_index]:
             INSTRUMENTS[instrument_index]["sound"].play()
             INSTRUMENTS[instrument_index]["sound"].set_volume(0.8)
         
         if self.game_state == GAME_STATE_WAITING_FOR_CREATOR:
-            # Twórca dodaje instrument do sekwencji
+            # Tworca dodaje instrument do sekwencji
             self.created_sequence.append(instrument_index)
-            print(f"{self.get_current_creator()} dodał: {INSTRUMENTS[instrument_index]['name']}")
+            print(f"{self.get_current_creator()} dodal: {INSTRUMENTS[instrument_index]['name']}")
             
-            # Sprawdź czy sekwencja jest kompletna
+            # Sprawdz czy sekwencja jest kompletna
             if len(self.created_sequence) >= self.current_level:
                 self.sequence = self.created_sequence.copy()
                 self.created_sequence = []
                 self.start_guessing_phase()
                 
         elif self.game_state == GAME_STATE_WAITING:
-            # Gracz odgadujący dodaje instrument
+            # Gracz odgadujacy dodaje instrument
             self.player_sequence.append(instrument_index)
             expected_instrument = self.sequence[self.current_sequence_index]
             
             current_guesser = self.get_current_guesser()
-            print(f"{current_guesser} wybrał: {INSTRUMENTS[instrument_index]['name']}")
+            print(f"{current_guesser} wybral: {INSTRUMENTS[instrument_index]['name']}")
             
             if instrument_index == expected_instrument:
                 print("✓ Dobrze!")
                 self.current_sequence_index += 1
                 
-                # Sprawdź czy gracz ukończył CAŁĄ sekwencję
+                # Sprawdz czy gracz ukonczyl CAla sekwencje
                 if self.current_sequence_index >= len(self.sequence):
-                    # Gracz odgadł całą sekwencję - przyznaj punkt
+                    # Gracz odgadl cala sekwencje - przyznaj punkt
                     self.scores[current_guesser] += 1
-                    self.show_timed_message(f"🎉 {current_guesser} odgadł całą sekwencję!", 2.0)
-                    print(f"🎉 {current_guesser} odgadł całą sekwencję!")
+                    self.show_timed_message(f"🎉 {current_guesser} odgadl cala sekwencje!", 2.0)
+                    print(f"🎉 {current_guesser} odgadl cala sekwencje!")
                     self.game_state = GAME_STATE_SUCCESS
                 else:
-                    # Gracz odgadł kolejny instrument, ale sekwencja jeszcze nie skończona
+                    # Gracz odgadl kolejny instrument, ale sekwencja jeszcze nie skonczona
                     remaining = len(self.sequence) - self.current_sequence_index
-                    self.show_timed_message(f"✓ Dobrze! Pozostało: {remaining}", 1.0)
+                    self.show_timed_message(f"✓ Dobrze! Pozostalo: {remaining}", 1.0)
             else:
-                # Błędna odpowiedź - twórca dostaje punkt za błąd gracza
+                # Bledna odpowiedz - tworca dostaje punkt za blad gracza
                 creator = self.get_current_creator()
                 if creator not in self.round_scores:
                     self.round_scores[creator] = 0
                 self.round_scores[creator] += 1
                 
                 expected_name = INSTRUMENTS[expected_instrument]['name']
-                print(f"✗ {current_guesser} się pomylił! Oczekiwano: {expected_name}")
-                self.show_timed_message(f"✗ {current_guesser} się pomylił na {self.current_sequence_index + 1}. instrumencie!", 2.0)
+                print(f"✗ {current_guesser} sie pomylil! Oczekiwano: {expected_name}")
+                self.show_timed_message(f"✗ {current_guesser} sie pomylil na {self.current_sequence_index + 1}. instrumencie!", 2.0)
                 self.game_state = GAME_STATE_GAME_OVER
     
     def start_guessing_phase(self):
-        """Rozpocznij fazę odgadywania - pokaż sekwencję"""
+        """Rozpocznij faze odgadywania - pokaz sekwencje"""
         self.current_guesser_idx = 0
-        # Pomiń twórcę sekwencji
+        # Pomin tworce sekwencji
         if self.current_guesser_idx == self.current_creator_idx:
             self.current_guesser_idx += 1
             
         self.game_state = GAME_STATE_SHOWING
         self.sequence_display_index = 0
         self.highlight_start_time = time.time()
-        self.show_timed_message("Obserwuj sekwencję...", 1.0)
+        self.show_timed_message("Obserwuj sekwencje...", 1.0)
         
         creator = self.get_current_creator()
         sequence_names = [INSTRUMENTS[i]['name'] for i in self.sequence]
         print(f"Sekwencja {creator}: {' -> '.join(sequence_names)}")
     
     def next_guesser(self):
-        """Przejdź do następnego gracza odgadującego"""
+        """Przejdz do nastepnego gracza odgadujacego"""
         self.current_guesser_idx += 1
         
-        # Pomiń twórcę sekwencji
+        # Pomin tworce sekwencji
         if self.current_guesser_idx == self.current_creator_idx:
             self.current_guesser_idx += 1
             
         if self.current_guesser_idx >= len(self.players):
-            # Wszyscy gracze już próbowali - koniec rundy
+            # Wszyscy gracze juz probowali - koniec rundy
             self.end_round()
         else:
-            # Następny gracz - zresetuj stan gry
+            # Nastepny gracz - zresetuj stan gry
             self.reset_for_next_guesser()
     
     def reset_for_next_guesser(self):
-        """Resetuj stan dla następnego gracza odgadującego"""
+        """Resetuj stan dla nastepnego gracza odgadujacego"""
         self.player_sequence = []
         self.current_sequence_index = 0
         self.game_state = GAME_STATE_SHOWING
@@ -297,57 +297,57 @@ class MultiplayerGame:
         self.reset_hover_state()
         
         current_guesser = self.get_current_guesser()
-        self.show_timed_message(f"Następny: {current_guesser}", 1.0)
+        self.show_timed_message(f"Nastepny: {current_guesser}", 1.0)
     
     def end_round(self):
-        """Zakończ rundę i przejdź do następnego twórcy lub poziomu"""
-        # Dodaj punkty twórcy za błędy innych graczy
+        """Zakoncz runde i przejdz do nastepnego tworcy lub poziomu"""
+        # Dodaj punkty tworcy za bledy innych graczy
         creator = self.get_current_creator()
         if creator in self.round_scores:
             self.scores[creator] += self.round_scores[creator]
-            print(f"{creator} zdobył {self.round_scores[creator]} punkt(ów) za błędy przeciwników")
+            print(f"{creator} zdobyl {self.round_scores[creator]} punkt(ow) za bledy przeciwnikow")
         
         self.round_scores = {}
         self.completed_rounds_in_level += 1
         
         if self.completed_rounds_in_level >= self.total_rounds_per_level:
-            # Wszyscy gracze stworzyli sekwencję na tym poziomie
+            # Wszyscy gracze stworzyli sekwencje na tym poziomie
             self.next_level()
         else:
-            # Następny gracz tworzy sekwencję
+            # Nastepny gracz tworzy sekwencje
             self.next_creator()
     
     def next_creator(self):
-        """Przejdź do następnego twórcy sekwencji"""
+        """Przejdz do nastepnego tworcy sekwencji"""
         self.current_creator_idx = (self.current_creator_idx + 1) % len(self.players)
         self.game_state = GAME_STATE_WAITING_FOR_CREATOR
         self.created_sequence = []
         self.reset_hover_state()
         
         creator = self.get_current_creator()
-        self.show_timed_message(f"Sekwencję wymyśla: {creator}", 2.0)
-        print(f"Kolej {creator} na wymyślenie sekwencji ({self.current_level} instrumentów)")
+        self.show_timed_message(f"Sekwencje wymyśla: {creator}", 2.0)
+        print(f"Kolej {creator} na wymyślenie sekwencji ({self.current_level} instrumentow)")
     
     def next_level(self):
-        """Przejdź do następnego poziomu"""
+        """Przejdz do nastepnego poziomu"""
         self.current_level += 1
         self.completed_rounds_in_level = 0
         self.current_creator_idx = 0  # Zacznij od pierwszego gracza
         
         self.show_timed_message(f"🎉 Poziom {self.current_level}!", 3.0)
-        print(f"🎉 Nowy poziom! Teraz {self.current_level} instrumentów")
+        print(f"🎉 Nowy poziom! Teraz {self.current_level} instrumentow")
         self.print_scores()
         
-        # Krótka przerwa przed następnym poziomem
+        # Krotka przerwa przed nastepnym poziomem
         time.sleep(1.0)
         self.next_creator()
     
     def print_scores(self):
-        """Wyświetl aktualny stan punktów"""
-        print("\n📊 Aktualny stan punktów:")
+        """Wyświetl aktualny stan punktow"""
+        print("\n📊 Aktualny stan punktow:")
         sorted_players = sorted(self.players, key=lambda p: self.scores[p], reverse=True)
         for i, player in enumerate(sorted_players, 1):
-            print(f"{i}. {player}: {self.scores[player]} punktów")
+            print(f"{i}. {player}: {self.scores[player]} punktow")
         print()
     
     def is_point_in_game_area(self, x, y, frame_width, frame_height):
@@ -356,12 +356,12 @@ class MultiplayerGame:
                 margin <= y <= frame_height - margin)
 
 def get_player_input(prompt, window_name):
-    """Funkcja do wprowadzania tekstu przez użytkownika"""
+    """Funkcja do wprowadzania tekstu przez uzytkownika"""
     text = ""
     img = np.ones((200, 600, 3), dtype=np.uint8) * 255
     
     while True:
-        # Wyczyść obraz
+        # Wyczyśc obraz
         img.fill(255)
         
         # Rysuj prompt
@@ -388,12 +388,12 @@ def get_player_input(prompt, window_name):
             if text:
                 text = text[:-1]
         elif 32 <= key <= 126:  # Znaki drukowalne
-            if len(text) < 20:  # Limit długości
+            if len(text) < 20:  # Limit dlugości
                 text += chr(key)
 
 def setup_multiplayer_game():
     """Konfiguracja gry wieloosobowej"""
-    # Pobierz liczbę graczy
+    # Pobierz liczbe graczy
     num_players_str = get_player_input("Ile graczy? (2-6):", "Liczba graczy")
     if not num_players_str:
         return None, None
@@ -401,10 +401,10 @@ def setup_multiplayer_game():
     try:
         num_players = int(num_players_str)
         if num_players < 2 or num_players > 6:
-            print("Liczba graczy musi być między 2 a 6!")
+            print("Liczba graczy musi byc miedzy 2 a 6!")
             return None, None
     except ValueError:
-        print("Nieprawidłowa liczba!")
+        print("Nieprawidlowa liczba!")
         return None, None
     
     # Pobierz imiona graczy
@@ -433,7 +433,7 @@ def draw_multiplayer_info(frame, game, control_mode):
     """Rysuj informacje dla trybu wieloosobowego"""
     h, w, _ = frame.shape
     
-    # Główna informacja
+    # Glowna informacja
     info_y = 30
     color = (100, 255, 255)
     
@@ -491,9 +491,9 @@ def draw_multiplayer_info(frame, game, control_mode):
     for i, player in enumerate(sorted_players):
         score_text = f"{player}: {game.scores[player]}"
         
-        # Podświetl aktualnego twórcę lub gracza
+        # Podświetl aktualnego tworce lub gracza
         if player == game.get_current_creator():
-            color = (100, 255, 255)  # Twórca - cyan
+            color = (100, 255, 255)  # Tworca - cyan
         elif player == game.get_current_guesser():
             color = (100, 255, 100)  # Aktualny gracz - zielony
         else:
@@ -506,7 +506,7 @@ def draw_game_interface(frame, game, cursor_x, cursor_y, control_mode):
     """Rysuj interfejs gry"""
     h, w, _ = frame.shape
     
-    # Rysuj tło
+    # Rysuj tlo
     cv2.rectangle(frame, (0, 0), (w, h), (20, 20, 20), -1)
     
     # Rysuj instrumenty
@@ -514,7 +514,7 @@ def draw_game_interface(frame, game, cursor_x, cursor_y, control_mode):
         pos = instrument["pos"]
         color = instrument["color"]
         
-        # Sprawdź podświetlenia
+        # Sprawdz podświetlenia
         is_sequence_highlight = (game.highlight_instrument == i)
         is_hover_highlight = (control_mode == CONTROL_HAND and hasattr(game, 'hover_instrument') and game.hover_instrument == i)
         
@@ -564,14 +564,14 @@ def draw_game_interface(frame, game, cursor_x, cursor_y, control_mode):
     return frame
 
 def run_multiplayer(control_mode):
-    """Główna funkcja uruchamiająca tryb multiplayer"""
+    """Glowna funkcja uruchamiajaca tryb multiplayer"""
     # Konfiguracja gry
     players, starting_level = setup_multiplayer_game()
     if players is None:
-        print("Anulowano konfigurację gry.")
+        print("Anulowano konfiguracje gry.")
         return "menu"
     
-    # Inicjalizacja MediaPipe (tylko dla trybu ręki)
+    # Inicjalizacja MediaPipe (tylko dla trybu reki)
     mp_hands = None
     hands = None
     if control_mode == CONTROL_HAND:
@@ -602,23 +602,23 @@ def run_multiplayer(control_mode):
     
     print("🎵 Edukacyjna Gra Muzyczna - Tryb Multiplayer 🎵")
     print("Tryb wieloosobowy aktywny!")
-    print("Obserwuj sekwencję i powtarzaj CAŁĄ SEKWENCJĘ aby zdobyć punkty!")
+    print("Obserwuj sekwencje i powtarzaj CAla SEKWENCJe aby zdobyc punkty!")
     if control_mode == CONTROL_HAND:
-        print("Trzymaj palec wskazujący prawej ręki nad instrumentem przez 1 sekundę aby go wybrać.")
+        print("Trzymaj palec wskazujacy prawej reki nad instrumentem przez 1 sekunde aby go wybrac.")
     else:
-        print("Użyj myszy do klikania na instrumenty.")
-    print("Naciśnij ESC aby zakończyć.")
+        print("Uzyj myszy do klikania na instrumenty.")
+    print("Naciśnij ESC aby zakonczyc.")
     
     while True:
         ret, frame = cap.read()
         if not ret:
-            print("Błąd: Nie można odczytać klatki z kamery")
+            print("Blad: Nie mozna odczytac klatki z kamery")
             break
         
         frame = cv2.flip(frame, 1)
         h, w, _ = frame.shape
         
-        # Znajdź pozycję kursora
+        # Znajdz pozycje kursora
         cursor_x, cursor_y = None, None
         
         if control_mode == CONTROL_HAND:
@@ -638,10 +638,10 @@ def run_multiplayer(control_mode):
             if not game.is_point_in_game_area(cursor_x, cursor_y, w, h):
                 cursor_x, cursor_y = None, None
         
-        # Aktualizuj grę
+        # Aktualizuj gre
         game.update()
         
-        # Obsłuż interakcje
+        # Obsluz interakcje
         if control_mode == CONTROL_HAND and cursor_x is not None and cursor_y is not None:
             game.update_hover(cursor_x, cursor_y)
         elif control_mode == CONTROL_MOUSE and mouse_clicked and cursor_x is not None and cursor_y is not None:
@@ -659,7 +659,7 @@ def run_multiplayer(control_mode):
         # Wyświetl
         cv2.imshow('Edukacyjna Gra Muzyczna - Multiplayer', frame)
         
-        # Sprawdź wyjście
+        # Sprawdz wyjście
         if cv2.waitKey(1) & 0xFF == 27:
             break
         if cv2.getWindowProperty("Edukacyjna Gra Muzyczna - Multiplayer", cv2.WND_PROP_VISIBLE) < 1:
@@ -674,9 +674,9 @@ def run_multiplayer(control_mode):
     # Wyświetl finalne wyniki
     print("\n🏆 FINALNE WYNIKI:")
     game.print_scores()
-    print("Dziękuję za grę w trybie multiplayer! 🎵")
+    print("Dziekuje za gre w trybie multiplayer! 🎵")
     return "menu"
 
 if __name__ == "__main__":
-    # Placeholder: Tryb powinien być wybrany w main.py
+    # Placeholder: Tryb powinien byc wybrany w main.py
     run_multiplayer(CONTROL_MOUSE)
