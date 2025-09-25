@@ -9,15 +9,16 @@ import os
 import pygame
 import json
 
+
 # Definicja instrumentów z pozycjami dopasowanymi do tła i nazwami plików obrazów
 INSTRUMENTS = [
     {"name": "Pianino", "pos": (950, 700), "size": 100, "color": (255, 100, 100), "image_file": "img/pianino.png"},
     {"name": "Trabka", "pos": (960, 270), "size": 40, "color": (100, 255, 100), "image_file": "img/trabka.png"},
-    {"name": "Harfa", "pos": (600, 700), "size": 50, "color": (100, 100, 255), "image_file": "img/harfa.png"},
+    {"name": "Harfa", "pos": (600, 700), "size": 80, "color": (100, 100, 255), "image_file": "img/harfa.png"},
     {"name": "Gitara", "pos": (100, 720), "size": 60, "color": (255, 255, 100), "image_file": "img/gitara.png"},
     {"name": "Perkusja", "pos": (382, 666), "size": 83, "color": (255, 100, 255), "image_file": "img/perkusja.png"},
-    {"name": "Flet", "pos": (590, 350), "size": 35, "color": (100, 255, 255), "image_file": "img/flet.png"},
-    {"name": "Bass", "pos": (450, 300), "size": 55, "color": (200, 150, 50), "image_file": "img/bass.png"},
+    {"name": "Flet", "pos": (690, 350), "size": 35, "color": (100, 255, 255), "image_file": "img/flet.png"},
+    {"name": "Bass", "pos": (450, 300), "size": 75, "color": (200, 150, 50), "image_file": "img/bass.png"},
 ]
 
 pygame.mixer.init()
